@@ -57,24 +57,62 @@ A powerful web application that transcribes audio files of any size using OpenAI
 
 4. **Configure API Key**
    
-   **Option 1: Environment Variable**
+   **Option 1: Use the run scripts (recommended)**
+   - Edit `run_local.sh` (macOS/Linux) or `run_local.bat` (Windows)
+   - Replace `your-api-key-here` with your actual OpenAI API key
+   
+   **Option 2: Environment Variable**
    ```bash
    export OPENAI_API_KEY="your-api-key-here"
    ```
    
-   **Option 2: Streamlit Secrets** (recommended for deployment)
-   Create `.streamlit/secrets.toml`:
-   ```toml
-   OPENAI_API_KEY = "your-api-key-here"
-   ```
+   **Option 3: Streamlit Secrets** (for cloud deployment)
+   The API key is already configured in `.streamlit/secrets.toml` for cloud deployment.
 
 5. **Run the application**
+   
+   **macOS/Linux:**
+   ```bash
+   ./run_local.sh
+   ```
+   
+   **Windows:**
+   ```cmd
+   run_local.bat
+   ```
+   
+   **Manual method:**
    ```bash
    streamlit run app.py
    ```
 
 6. **Open your browser**
    Navigate to `http://localhost:8501`
+
+## 🌐 Cloud Deployment
+
+### **Streamlit Cloud (Recommended)**
+
+1. **Go to [share.streamlit.io](https://share.streamlit.io)**
+2. **Sign in with your GitHub account**
+3. **Click "New app"**
+4. **Fill in:**
+   - **Repository**: `ShadowBoxer228/ai_mp3_transcribe`
+   - **Branch**: `main`
+   - **Main file path**: `app_cloud.py`
+5. **Click "Deploy!"**
+
+The app will be available at: `https://your-app-name.streamlit.app`
+
+### **Cloud Features**
+- ✅ **Enhanced debugging** with real-time logs
+- ✅ **Performance monitoring** for each step
+- ✅ **Error recovery** with detailed stack traces
+- ✅ **Debug mode toggle** in sidebar
+- ✅ **API connection testing**
+- ✅ **Cloud-optimized processing**
+
+For detailed deployment instructions, see [STREAMLIT_CLOUD_DEPLOYMENT.md](STREAMLIT_CLOUD_DEPLOYMENT.md)
 
 ## 📁 Project Structure
 
