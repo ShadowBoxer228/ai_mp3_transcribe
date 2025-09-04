@@ -15,8 +15,9 @@ try:
     from pydub.silence import split_on_silence, detect_silence
     PYDUB_AVAILABLE = True
 except ImportError as e:
-    st.error(f"❌ pydub import failed: {str(e)}")
-    st.error("Please install required dependencies: pip install pydub pyaudioop-lts")
+    # Don't use st.error here as it might cause issues during import
+    print(f"Warning: pydub import failed: {str(e)}")
+    print("Please install required dependencies: pip install pydub pyaudioop-lts")
     PYDUB_AVAILABLE = False
     # Create dummy classes for graceful degradation
     class AudioSegment:

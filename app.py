@@ -106,21 +106,13 @@ def display_header():
     try:
         from audio_processor import PYDUB_AVAILABLE
         if not PYDUB_AVAILABLE:
-            st.error("""
-            <div class="error-box">
-                <strong>⚠️ Audio Processing Not Available</strong><br>
-                The audio processing dependencies (pydub, pyaudioop-lts) are not installed. 
-                Please install them using: <code>pip install pydub pyaudioop-lts</code>
-            </div>
-            """, unsafe_allow_html=True)
+            st.error("⚠️ Audio Processing Not Available")
+            st.error("The audio processing dependencies (pydub, pyaudioop-lts) are not installed.")
+            st.error("Please install them using: pip install pydub pyaudioop-lts")
             return False
     except ImportError:
-        st.error("""
-        <div class="error-box">
-            <strong>⚠️ Audio Processing Module Not Found</strong><br>
-            The audio_processor module could not be imported. Please check your installation.
-        </div>
-        """, unsafe_allow_html=True)
+        st.error("⚠️ Audio Processing Module Not Found")
+        st.error("The audio_processor module could not be imported. Please check your installation.")
         return False
     
     st.markdown("""
