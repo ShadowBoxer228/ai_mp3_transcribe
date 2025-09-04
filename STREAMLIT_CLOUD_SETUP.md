@@ -2,7 +2,15 @@
 
 ## 📋 Quick Setup Steps
 
-### 1. Configure API Key in Streamlit Cloud
+### 1. Deploy the Cloud-Optimized Version
+
+**Recommended:** Use `app_cloud.py` for Streamlit Cloud deployment:
+
+1. **Go to Streamlit Cloud** and create a new app
+2. **Set main file path to:** `app_cloud.py`
+3. **This version is specifically optimized for cloud deployment**
+
+### 2. Configure API Key in Streamlit Cloud
 
 1. **Go to your deployed app** on Streamlit Cloud
 2. **Click the gear icon (⚙️)** in the bottom right corner
@@ -15,11 +23,26 @@ OPENAI_API_KEY = "your-openai-api-key-here"
 
 **Note:** Replace `"your-openai-api-key-here"` with your actual OpenAI API key. You can find your API key in the project files or get a new one from [OpenAI Platform](https://platform.openai.com/api-keys).
 
-### 2. Save and Restart
+### 3. Save and Restart
 
 1. **Click "Save"** in the secrets configuration
 2. **The app will automatically restart** with the new configuration
 3. **Refresh your browser** to see the changes
+
+## 📊 App Versions
+
+### Cloud-Optimized Version (`app_cloud.py`)
+- ✅ **Designed for Streamlit Cloud** - No dependency issues
+- ✅ **Simple, reliable transcription** - Works consistently
+- ✅ **Environment detection** - Adapts to cloud vs local
+- ✅ **Simplified UI** - Clean, cloud-friendly interface
+- ✅ **Basic export options** - TXT and JSON formats
+
+### Full-Featured Version (`app.py`)
+- ✅ **Advanced audio processing** - Chunking, silence detection
+- ✅ **Multiple export formats** - TXT, SRT, VTT, JSON
+- ✅ **Debug tools** - Comprehensive logging and testing
+- ✅ **Local development** - Best for local testing
 
 ## ✅ Expected Results
 
