@@ -7,9 +7,24 @@ import os
 import tempfile
 import io
 from typing import List, Tuple, Optional
-from pydub import AudioSegment
-from pydub.silence import split_on_silence, detect_silence
 import streamlit as st
+
+# Try to import pydub with fallback handling
+try:
+    from pydub import AudioSegment
+    from pydub.silence import split_on_silence, detect_silence
+    PYDUB_AVAILABLE = True
+except ImportError as e:
+    st.error(f"❌ pydub import failed: {str(e)}")
+    st.error("Please install required dependencies: pip install pydub pyaudioop-lts")
+    PYDUB_AVAILABLE = False
+    # Create dummy classes for graceful degradation
+    class AudioSegment:
+        pass
+    def split_on_silence(*args, **kwargs):
+        return []
+    def detect_silence(*args, **kwargs):
+        return []
 
 
 class AudioProcessor:
@@ -44,6 +59,9 @@ class AudioProcessor:
         Returns:
             Tuple of (is_valid, error_message, audio_segment)
         """
+        if not PYDUB_AVAILABLE:
+            return False, "Audio processing dependencies not available. Please install pydub and pyaudioop-lts.", None
+            
         try:
             # Check file extension
             file_extension = uploaded_file.name.split('.')[-1].lower()

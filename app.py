@@ -101,6 +101,28 @@ def get_api_key() -> Optional[str]:
 def display_header():
     """Display application header"""
     st.markdown('<h1 class="main-header">🎤 Audio Transcription App</h1>', unsafe_allow_html=True)
+    
+    # Check if audio processing is available
+    try:
+        from audio_processor import PYDUB_AVAILABLE
+        if not PYDUB_AVAILABLE:
+            st.error("""
+            <div class="error-box">
+                <strong>⚠️ Audio Processing Not Available</strong><br>
+                The audio processing dependencies (pydub, pyaudioop-lts) are not installed. 
+                Please install them using: <code>pip install pydub pyaudioop-lts</code>
+            </div>
+            """, unsafe_allow_html=True)
+            return False
+    except ImportError:
+        st.error("""
+        <div class="error-box">
+            <strong>⚠️ Audio Processing Module Not Found</strong><br>
+            The audio_processor module could not be imported. Please check your installation.
+        </div>
+        """, unsafe_allow_html=True)
+        return False
+    
     st.markdown("""
     <div class="info-box">
         <strong>Powered by OpenAI Whisper</strong><br>
@@ -108,6 +130,7 @@ def display_header():
         Large files are automatically split into chunks for optimal processing.
     </div>
     """, unsafe_allow_html=True)
+    return True
 
 
 def display_sidebar():
@@ -536,8 +559,9 @@ def main():
     # Initialize session state
     initialize_session_state()
     
-    # Display header
-    display_header()
+    # Display header and check dependencies
+    if not display_header():
+        st.stop()
     
     # Display sidebar and get settings
     settings = display_sidebar()
