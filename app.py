@@ -106,10 +106,10 @@ def display_header():
     try:
         from audio_processor import PYDUB_AVAILABLE
         if not PYDUB_AVAILABLE:
-            st.error("⚠️ Audio Processing Not Available")
-            st.error("The audio processing dependencies (pydub, pyaudioop-lts) are not installed.")
-            st.error("Please install them using: pip install pydub pyaudioop-lts")
-            return False
+            st.warning("⚠️ Audio Processing Limited")
+            st.info("Audio processing dependencies are not fully available.")
+            st.info("The app will work with basic functionality. For full features, install: pip install pydub")
+            # Don't return False - let the app continue with limited functionality
     except ImportError:
         st.error("⚠️ Audio Processing Module Not Found")
         st.error("The audio_processor module could not be imported. Please check your installation.")
@@ -257,9 +257,82 @@ def display_audio_info(audio_processor: AudioProcessor, audio_segment):
         st.success("✅ File size is within limits - no chunking needed")
 
 
+def simple_transcription_fallback(uploaded_file, settings: Dict[str, Any]):
+    """Simple transcription without chunking for when pydub is not available"""
+    import time
+    import tempfile
+    import os
+    
+    st.markdown("### 🎯 Simple Transcription Mode")
+    st.info("Using simple transcription mode (no chunking)")
+    
+    try:
+        from openai import OpenAI
+        
+        client = OpenAI(api_key=settings['api_key'])
+        
+        # Create temporary file
+        temp_file = tempfile.NamedTemporaryFile(delete=False, suffix='.mp3')
+        temp_file.write(uploaded_file.read())
+        temp_file.close()
+        
+        try:
+            st.info("🔄 Transcribing audio file...")
+            start_time = time.time()
+            
+            # Transcribe
+            with open(temp_file.name, 'rb') as f:
+                response = client.audio.transcriptions.create(
+                    model="whisper-1",
+                    file=f,
+                    language=settings['language'],
+                    response_format='verbose_json',
+                    timestamp_granularities=['word', 'segment']
+                )
+            
+            transcription_time = time.time() - start_time
+            st.success(f"✅ Transcription completed in {transcription_time:.2f} seconds")
+            
+            # Format result
+            result = {
+                'success': True,
+                'text': response.text,
+                'language': getattr(response, 'language', settings['language']),
+                'duration': getattr(response, 'duration', None),
+                'segments': getattr(response, 'segments', []),
+                'words': getattr(response, 'words', []),
+                'total_duration': getattr(response, 'duration', 0),
+                'chunk_count': 1,
+                'failed_chunks': 0
+            }
+            
+            return result
+            
+        finally:
+            # Clean up
+            os.unlink(temp_file.name)
+            
+    except Exception as e:
+        return {
+            'success': False,
+            'text': '',
+            'error': str(e),
+            'total_duration': 0,
+            'chunk_count': 0,
+            'failed_chunks': 1
+        }
+
 def process_transcription(uploaded_file, settings: Dict[str, Any]):
     """Process audio transcription with detailed debugging"""
     import time
+    
+    # Check if we should use simple mode
+    try:
+        from audio_processor import PYDUB_AVAILABLE
+        if not PYDUB_AVAILABLE:
+            return simple_transcription_fallback(uploaded_file, settings)
+    except ImportError:
+        return simple_transcription_fallback(uploaded_file, settings)
     
     # Initialize components
     st.markdown("### 🔧 Initializing Components")
