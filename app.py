@@ -81,7 +81,7 @@ def initialize_session_state():
 
 
 def get_api_key() -> Optional[str]:
-    """Get OpenAI API key from secrets or environment"""
+    """Get OpenAI API key from secrets, environment, or session state"""
     # Try Streamlit secrets first
     try:
         api_key = st.secrets.get("OPENAI_API_KEY")
@@ -94,6 +94,10 @@ def get_api_key() -> Optional[str]:
     api_key = os.getenv("OPENAI_API_KEY")
     if api_key:
         return api_key
+    
+    # Try manual API key from session state
+    if hasattr(st.session_state, 'manual_api_key') and st.session_state.manual_api_key:
+        return st.session_state.manual_api_key
     
     return None
 
@@ -120,9 +124,25 @@ def display_sidebar():
         if api_key:
             st.success("✅ API Key configured")
         else:
-            st.error("❌ API Key not found")
-            st.info("Please configure your OpenAI API key in the secrets or environment variables")
-            return False
+            st.warning("⚠️ API Key not found in secrets")
+            st.info("Please enter your OpenAI API key manually:")
+            
+            # Manual API key input
+            manual_api_key = st.text_input(
+                "OpenAI API Key",
+                type="password",
+                placeholder="sk-proj-...",
+                help="Enter your OpenAI API key to use the transcription service"
+            )
+            
+            if manual_api_key:
+                # Store in session state
+                st.session_state.manual_api_key = manual_api_key
+                st.success("✅ API Key entered successfully!")
+                api_key = manual_api_key
+            else:
+                st.error("❌ Please enter your API key to continue")
+                return False
         
         # Language selection
         language = st.selectbox(

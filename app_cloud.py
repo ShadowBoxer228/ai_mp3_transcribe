@@ -117,6 +117,11 @@ def get_api_key() -> Optional[str]:
         log_debug("✅ API key found in environment variables")
         return api_key
     
+    # Try manual API key from session state
+    if hasattr(st.session_state, 'manual_api_key') and st.session_state.manual_api_key:
+        log_debug("✅ API key found in session state (manual input)")
+        return st.session_state.manual_api_key
+    
     log_debug("❌ No API key found", "ERROR")
     return None
 
@@ -148,9 +153,28 @@ def display_sidebar():
             st.success("✅ API Key configured")
             log_debug("API key validation successful")
         else:
-            st.error("❌ API Key not found")
-            log_debug("API key validation failed", "ERROR")
-            return False
+            st.warning("⚠️ API Key not found in secrets")
+            log_debug("API key not found in secrets", "WARNING")
+            st.info("Please enter your OpenAI API key manually:")
+            
+            # Manual API key input
+            manual_api_key = st.text_input(
+                "OpenAI API Key",
+                type="password",
+                placeholder="sk-proj-...",
+                help="Enter your OpenAI API key to use the transcription service"
+            )
+            
+            if manual_api_key:
+                # Store in session state
+                st.session_state.manual_api_key = manual_api_key
+                st.success("✅ API Key entered successfully!")
+                log_debug("Manual API key entered successfully")
+                api_key = manual_api_key
+            else:
+                st.error("❌ Please enter your API key to continue")
+                log_debug("No API key provided", "ERROR")
+                return False
         
         # Debug mode toggle
         debug_mode = st.checkbox("🐛 Debug Mode", value=st.session_state.debug_mode)
